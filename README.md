@@ -1,4 +1,4 @@
-# todolist-composition-api-vue3
+# todolist-vue3
 
 ## Project setup
 ```

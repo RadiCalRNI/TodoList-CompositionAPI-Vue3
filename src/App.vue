@@ -1,26 +1,134 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <app-header></app-header>
+  <main>
+    <add-todo @addTodo="addNewTodo"></add-todo>
+
+    <ul class="todos">
+      <todo-item
+        v-for="(task, index) in list"
+        :key="task.key"
+        :todo="task"
+        @delete="deleteTodo"
+        @checked="checked"
+        @dragover.prevent
+        @dragstart="dragStart(index)"
+        @drop="dragEnd(index)"
+      ></todo-item>
+    </ul>
+
+    <app-stat
+      @deleteCompleted="deleteCompleted"
+      :counter="unCheckedTask"
+      @activeTab="getTodo"
+    ></app-stat>
+  </main>
+  <app-footer></app-footer>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
+import AppHeader from "./components/AppHeader.vue";
+import AddTodo from "./components/AddTodo.vue";
+import TodoItem from "./components/TodoItem.vue";
+import AppFooter from "./components/AppFooter.vue";
+import AppStat from "./components/AppStat.vue";
 export default {
-  name: 'App',
   components: {
-    HelloWorld
-  }
-}
+    AppHeader,
+    AddTodo,
+    TodoItem,
+    AppFooter,
+    AppStat,
+  },
+
+  data() {
+    return {
+      todoList: [],
+      dragging: -1,
+      tab: "",
+    };
+  },
+
+  methods: {
+    addNewTodo(title) {
+      if (title) {
+        const key = Math.random().toString(16).slice(2);
+        const isComplete = false;
+        const task = { key, title, isComplete };
+        this.todoList.push(task);
+        this.$toast.success(`${title} با موفقیت اضافه شد`, {
+          position: "top-left",
+          duration: 2996,
+          max: 3,
+        });
+      } else {
+        this.$toast.error("لطفا متنی وارد کنید", {
+          position: "bottom-left",
+          duration: 2996,
+          max: 3,
+        });
+      }
+    },
+
+    deleteTodo(key) {
+      this.todoList = this.todoList.filter((item) => item.key != key);
+      this.$toast.error(` تسک مورد نظر با موفقیت حذف شد`, {
+        position: "bottom-left",
+        duration: 2996,
+        max: 3,
+      });
+    },
+
+    checked(key, isComplete) {
+      this.todoList.forEach((item) => {
+        if (item.key == key) {
+          item.isComplete = isComplete;
+        }
+      });
+    },
+
+    deleteCompleted() {
+      this.todoList = this.todoList.filter((item) => item.isComplete === false);
+      this.$toast.error(` تسک های مورد نظر با موفقیت حذف شد`, {
+        position: "bottom-left",
+        duration: 2996,
+        max: 3,
+      });
+    },
+
+    dragStart(index) {
+      this.dragging = index;
+    },
+
+    dragEnd(index) {
+      const element = this.todoList.splice(this.dragging, 1)[0];
+      this.todoList.splice(index, 0, element);
+    },
+
+    getTodo(activeTab) {
+      this.tab = activeTab;
+    },
+  },
+
+  computed: {
+    unCheckedTask() {
+      let unCheckedTasks = this.todoList.filter(
+        (item) => item.isComplete == false
+      );
+      return unCheckedTasks.length;
+    },
+    list() {
+      if (this.tab == "all") {
+        return this.todoList;
+      } else if (this.tab == "active") {
+        return this.todoList.filter((item) => item.isComplete === false);
+      } else if (this.tab == "completed") {
+        return this.todoList.filter((item) => item.isComplete === true);
+      } else {
+        return this.todoList;
+      }
+    },
+  },
+};
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<style></style>
