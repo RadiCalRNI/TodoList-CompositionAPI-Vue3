@@ -32,6 +32,7 @@ import TodoItem from "./components/TodoItem.vue";
 import AppFooter from "./components/AppFooter.vue";
 import AppStat from "./components/AppStat.vue";
 import { computed, ref } from "vue";
+
 const todoList = ref([]);
 const dragging = ref(-1);
 const tab = ref("");
@@ -42,27 +43,11 @@ function addNewTodo(title) {
     const isComplete = false;
     const task = { key, title, isComplete };
     todoList.value.push(task);
-    this.$toast.success(`${title} با موفقیت اضافه شد`, {
-      position: "top-left",
-      duration: 2996,
-      max: 3,
-    });
-  } else {
-    this.$toast.error(`متنی را وارد کنید`, {
-    position: "bottom-left",
-    duration: 2996,
-    max: 3,
-  });
   }
 }
 
 function deleteTodo(key) {
   todoList.value = todoList.value.filter((item) => item.key != key);
-  this.$toast.error(` تسک مورد نظر با موفقیت حذف شد`, {
-    position: "bottom-left",
-    duration: 2996,
-    max: 3,
-  });
 }
 
 function checked(key, isComplete) {
@@ -75,11 +60,6 @@ function checked(key, isComplete) {
 
 function deleteCompleted() {
   todoList.value = todoList.value.filter((item) => item.isComplete === false);
-  this.$toast.error(` تسک های مورد نظر با موفقیت حذف شد`, {
-    position: "bottom-left",
-    duration: 2996,
-    max: 3,
-  });
 }
 
 function dragStart(index) {
