@@ -25,110 +25,94 @@
   <app-footer></app-footer>
 </template>
 
-<script>
+<script setup>
 import AppHeader from "./components/AppHeader.vue";
 import AddTodo from "./components/AddTodo.vue";
 import TodoItem from "./components/TodoItem.vue";
 import AppFooter from "./components/AppFooter.vue";
 import AppStat from "./components/AppStat.vue";
-export default {
-  components: {
-    AppHeader,
-    AddTodo,
-    TodoItem,
-    AppFooter,
-    AppStat,
-  },
+import { computed, ref } from "vue";
+const todoList = ref([]);
+const dragging = ref(-1);
+const tab = ref("");
 
-  data() {
-    return {
-      todoList: [],
-      dragging: -1,
-      tab: "",
-    };
-  },
+function addNewTodo(title) {
+  if (title) {
+    const key = Math.random().toString(16).slice(2);
+    const isComplete = false;
+    const task = { key, title, isComplete };
+    todoList.value.push(task);
+    this.$toast.success(`${title} با موفقیت اضافه شد`, {
+      position: "top-left",
+      duration: 2996,
+      max: 3,
+    });
+  } else {
+    this.$toast.error(`متنی را وارد کنید`, {
+    position: "bottom-left",
+    duration: 2996,
+    max: 3,
+  });
+  }
+}
 
-  methods: {
-    addNewTodo(title) {
-      if (title) {
-        const key = Math.random().toString(16).slice(2);
-        const isComplete = false;
-        const task = { key, title, isComplete };
-        this.todoList.push(task);
-        this.$toast.success(`${title} با موفقیت اضافه شد`, {
-          position: "top-left",
-          duration: 2996,
-          max: 3,
-        });
-      } else {
-        this.$toast.error("لطفا متنی وارد کنید", {
-          position: "bottom-left",
-          duration: 2996,
-          max: 3,
-        });
-      }
-    },
+function deleteTodo(key) {
+  todoList.value = todoList.value.filter((item) => item.key != key);
+  this.$toast.error(` تسک مورد نظر با موفقیت حذف شد`, {
+    position: "bottom-left",
+    duration: 2996,
+    max: 3,
+  });
+}
 
-    deleteTodo(key) {
-      this.todoList = this.todoList.filter((item) => item.key != key);
-      this.$toast.error(` تسک مورد نظر با موفقیت حذف شد`, {
-        position: "bottom-left",
-        duration: 2996,
-        max: 3,
-      });
-    },
+function checked(key, isComplete) {
+  todoList.value.forEach((item) => {
+    if (item.key == key) {
+      item.isComplete = isComplete;
+    }
+  });
+}
 
-    checked(key, isComplete) {
-      this.todoList.forEach((item) => {
-        if (item.key == key) {
-          item.isComplete = isComplete;
-        }
-      });
-    },
+function deleteCompleted() {
+  todoList.value = todoList.value.filter((item) => item.isComplete === false);
+  this.$toast.error(` تسک های مورد نظر با موفقیت حذف شد`, {
+    position: "bottom-left",
+    duration: 2996,
+    max: 3,
+  });
+}
 
-    deleteCompleted() {
-      this.todoList = this.todoList.filter((item) => item.isComplete === false);
-      this.$toast.error(` تسک های مورد نظر با موفقیت حذف شد`, {
-        position: "bottom-left",
-        duration: 2996,
-        max: 3,
-      });
-    },
+function dragStart(index) {
+  dragging.value = index;
+}
 
-    dragStart(index) {
-      this.dragging = index;
-    },
+function dragEnd(index) {
+  const element = todoList.value.splice(dragging.value, 1)[0];
+  todoList.value.splice(index, 0, element);
+}
 
-    dragEnd(index) {
-      const element = this.todoList.splice(this.dragging, 1)[0];
-      this.todoList.splice(index, 0, element);
-    },
+function getTodo(activeTab) {
+  tab.value = activeTab;
+}
 
-    getTodo(activeTab) {
-      this.tab = activeTab;
-    },
-  },
+const unCheckedTask = computed(() => {
+  let unCheckedTasks = todoList.value.filter(
+    (item) => item.isComplete == false
+  );
+  return unCheckedTasks.length;
+});
 
-  computed: {
-    unCheckedTask() {
-      let unCheckedTasks = this.todoList.filter(
-        (item) => item.isComplete == false
-      );
-      return unCheckedTasks.length;
-    },
-    list() {
-      if (this.tab == "all") {
-        return this.todoList;
-      } else if (this.tab == "active") {
-        return this.todoList.filter((item) => item.isComplete === false);
-      } else if (this.tab == "completed") {
-        return this.todoList.filter((item) => item.isComplete === true);
-      } else {
-        return this.todoList;
-      }
-    },
-  },
-};
+const list = computed(() => {
+  if (tab.value == "all") {
+    return todoList.value;
+  } else if (tab.value == "active") {
+    return todoList.value.filter((item) => item.isComplete === false);
+  } else if (tab.value == "completed") {
+    return todoList.value.filter((item) => item.isComplete === true);
+  } else {
+    return todoList.value;
+  }
+});
 </script>
 
 <style></style>

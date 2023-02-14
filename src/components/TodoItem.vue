@@ -27,6 +27,8 @@ const emits = defineEmits(["delete", "checked"]);
 
 const deleteTodo = () => {
   if (confirm("آیا از حذف تسک مطعمن هستید؟")) {
+    console.log(props.todo);
+    console.log(props.todo.key);
     emits("delete", props.todo.key);
   }
 };
