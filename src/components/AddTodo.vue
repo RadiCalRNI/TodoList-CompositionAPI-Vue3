@@ -25,7 +25,7 @@ import { ref, defineEmits } from "vue";
 
 const todoText = ref("");
 
-const emit = defineEmits("addTodo")
+const emit = defineEmits(["addTodo"])
 function addTodo() {
   emit("addTodo", todoText.value);
   todoText.value = "";

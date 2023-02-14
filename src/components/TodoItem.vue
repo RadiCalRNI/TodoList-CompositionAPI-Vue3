@@ -4,14 +4,14 @@
       <input
         type="checkbox"
         class="cb-input"
-        :checked="todo.isComplete ? true : false"
+        :checked="props.todo.isComplete ? true : false"
         @click="checked"
       />
       <span class="check"></span>
     </div>
     <p class="item">
-      <del v-if="todo.isComplete">{{ todo.title }}</del>
-      <span v-else v-text="todo.title"></span>
+      <del v-if="props.todo.isComplete">{{ props.todo.title }}</del>
+      <span v-else v-text="props.todo.title"></span>
     </p>
     <button class="clear" @click="deleteTodo">
       <img src="../assets/images/icon-cross.svg" alt="Clear it" />
@@ -19,23 +19,20 @@
   </li>
 </template>
 
-<script>
-export default {
-  props: {
-    todo: Object,
-  },
+<script setup>
+import { defineEmits, defineProps } from "vue";
 
-  methods: {
-    deleteTodo() {
-      if (confirm("آیا از حذف تسک مطعمن هستید؟")) {
-        this.$emit("delete", this.todo.key);
-      }
-    },
+const props = defineProps({ todo: Object });
+const emits = defineEmits(["delete", "checked"]);
 
-    checked() {
-      this.$emit("checked", this.todo.key, !this.todo.isComplete);
-    },
-  },
+const deleteTodo = () => {
+  if (confirm("آیا از حذف تسک مطعمن هستید؟")) {
+    emits("delete", props.todo.key);
+  }
+};
+
+const checked = () => {
+  emits("checked", props.todo.key, !props.todo.isComplete);
 };
 </script>
 
